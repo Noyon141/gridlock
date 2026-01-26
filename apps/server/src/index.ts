@@ -27,7 +27,7 @@ app.get("/", (c) => {
   return c.text("GridLock Backend Active 🟢");
 });
 
-const port = 3000;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 8080;
 console.log(`Server is running on port ${port}`);
 
 serve({
