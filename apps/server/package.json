@@ -1,12 +1,23 @@
 {
   "name": "server",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts"
   },
   "dependencies": {
+    "@gridlock/db": "workspace:*",
+    "@hono/node-server": "^1.19.9",
+    "@neondatabase/serverless": "^1.0.2",
+    "better-auth": "^1.4.17",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1",
     "hono": "^4.11.5"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^25.0.10",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
