@@ -1,0 +1,22 @@
+{
+  "name": "@gridlock/db",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "bunx build tsc"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.0.10",
+    "drizzle-kit": "^0.31.8"
+  },
+  "peerDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1"
+  }
+}
