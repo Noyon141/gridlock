@@ -12,8 +12,15 @@ export const auth = betterAuth({
     provider: "pg",
     schema: schema,
   }),
+
   emailAndPassword: {
     enabled: true,
+  },
+
+  advanced: {
+    database: {
+      generateId: () => crypto.randomUUID(),
+    },
   },
   // We will add Social Providers (Google/Github) here later if needed
 });
