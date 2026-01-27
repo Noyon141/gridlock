@@ -1,4 +1,4 @@
-import { Text } from "@/components/Themed";
+import { Text } from "@/components/ui/text";
 import "@/global.css";
 import { SafeAreaView } from "react-native-safe-area-context";
 
