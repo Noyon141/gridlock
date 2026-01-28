@@ -42,7 +42,7 @@ const RootLayout = () => {
 
   return (
     <>
-      <ThemeProvider value={NAV_THEME[colorScheme.get() ?? "light"]}>
+      <ThemeProvider value={NAV_THEME[colorScheme.get() ?? "dark"]}>
         <StatusBar
           barStyle={
             colorScheme.get() === "dark" ? "light-content" : "dark-content"
