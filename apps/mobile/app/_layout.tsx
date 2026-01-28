@@ -1,66 +1,59 @@
-import "@/global.css";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { useAuthStore } from "@/features/auth/store";
+import { NAV_THEME } from "@/lib/theme";
+import { ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import "react-native-reanimated";
+import { Slot, useRouter, useSegments } from "expo-router";
+import { colorScheme } from "nativewind";
+import React, { useEffect } from "react";
+import { ActivityIndicator, StatusBar, View } from "react-native";
+import ToastManager from "toastify-react-native";
 
-import { useColorScheme } from "@/components/useColorScheme";
+const RootLayout = () => {
+  const { user, isLoading, checkSession } = useAuthStore();
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...FontAwesome.font,
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+  const segments = useSegments();
+  const router = useRouter();
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    checkSession();
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const inAuthGroup = segments[0] === "(auth)";
+
+    if (!user && !inAuthGroup) {
+      //User is not logged in and not in auth group
+      router.replace("/(auth)/sign-in");
+    } else if (user && inAuthGroup) {
+      //User is logged in and not in auth group
+      router.replace("/(tabs)");
     }
-  }, [loaded]);
+  }, [user, isLoading, segments]);
 
-  if (!loaded) {
-    return null;
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-black justify-center items-center">
+        <ActivityIndicator size="large" color="#2563eb" />
+      </View>
+    );
   }
 
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-      </Stack>
-      <PortalHost />
-    </ThemeProvider>
+    <>
+      <ThemeProvider value={NAV_THEME[colorScheme.get() ?? "dark"]}>
+        <StatusBar
+          barStyle={
+            colorScheme.get() === "dark" ? "light-content" : "dark-content"
+          }
+        />
+        <Slot />
+        <PortalHost />
+        <ToastManager />
+      </ThemeProvider>
+    </>
   );
-}
+};
+
+export default RootLayout;

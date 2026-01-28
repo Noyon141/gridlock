@@ -19,9 +19,11 @@ app.use(
 );
 
 // Mount Better Auth Routes
-app.on(["POST", "GET"], "/api/auth/**", (c) => {
-  return auth.handler(c.req.raw);
-});
+// app.on(["POST", "GET"], "/api/auth/**", (c) => {
+//   return auth.handler(c.req.raw);
+// });
+
+app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 app.get("/", (c) => {
   return c.text("GridLock Backend Active 🟢");
