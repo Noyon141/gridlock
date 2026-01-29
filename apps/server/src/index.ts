@@ -4,6 +4,7 @@ import { sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { auth, db } from "./auth";
+import { InventoryItem } from "./types/types";
 
 const app = new Hono();
 
@@ -54,13 +55,13 @@ app.post("/api/inventory/sync", async (c) => {
     return c.json({ message: "No items to sync", success: true, count: 0 });
   }
 
-  const records = items.map((item: any) => ({
+  const records = items.map((item: InventoryItem) => ({
     id: item.id,
     name: item.name,
     sku: item.sku,
     quantity: item.quantity,
     userId: userId,
-    updatedAt: new Date(item.updatedAt),
+    updatedAt: new Date(),
     synced: true,
   }));
 
@@ -76,7 +77,7 @@ app.post("/api/inventory/sync", async (c) => {
           name: sql`excluded.name`,
           sku: sql`excluded.sku`,
           quantity: sql`excluded.quantity`,
-          updatedAt: sql`excluded.updated_at`,
+          updatedAt: sql`excluded.updatedAt`,
         },
       });
 
