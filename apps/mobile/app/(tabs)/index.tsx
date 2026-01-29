@@ -19,13 +19,10 @@ const InventoryScreen = () => {
   const [sku, setSku] = useState("");
 
   useEffect(() => {
-    console.log("Migration success status changed:", success);
     if (success) refresh();
   }, [success]);
 
   const handleAddItem = async () => {
-    console.log("Adding item:", { name, sku });
-
     if (!name || !sku) {
       Toast.error("Name and SKU are required");
       return;
@@ -33,15 +30,11 @@ const InventoryScreen = () => {
 
     await addItem(name, sku, 10);
 
-    console.log("Item added:", { name, sku });
-
     setName("");
     setSku("");
   };
 
   if (error) {
-    console.error("Database migration error:", error);
-
     return (
       <>
         <Text className="text-red-500 pt-10">
@@ -52,7 +45,6 @@ const InventoryScreen = () => {
     );
   }
   if (!success) {
-    console.log("Database migration in progress...");
     return (
       <>
         <Text className="pt-10">Migrating DB...</Text>
@@ -92,9 +84,10 @@ const InventoryScreen = () => {
             />
             <Button
               onPress={handleAddItem}
-              className="bg-blue-600 hover:bg-blue-700 mt-2"
+              variant={"secondary"}
+              className="mt-2"
             >
-              <Text className="text-white font-semibold">Add to Local DB</Text>
+              <Text className="font-semibold">Add</Text>
             </Button>
           </View>
         </View>
