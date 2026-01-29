@@ -1,8 +1,16 @@
 import { create } from "zustand";
 import { inventoryRepo } from "./repository";
 
+type Items = {
+  id: string;
+  name: string;
+  sku: string;
+  quantity: number;
+  synced: boolean;
+};
+
 interface InventoryState {
-  items: unknown[];
+  items: Items[];
 
   refresh: () => Promise<void>;
   addItem: (name: string, sku: string, quantity: number) => Promise<void>;

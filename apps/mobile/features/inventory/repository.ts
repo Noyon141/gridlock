@@ -1,7 +1,7 @@
 import { db } from "@/core/db/client";
 import { localInventory } from "@/core/db/schema";
 import { eq } from "drizzle-orm";
-import Crypto from "expo-crypto";
+import * as Crypto from "expo-crypto";
 
 export const inventoryRepo = {
   //READ LOCAL INVENTORY TABLE USING DRIZZLE ORM
