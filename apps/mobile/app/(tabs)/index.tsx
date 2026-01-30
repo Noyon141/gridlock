@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useMigrationHelper } from "@/core/db/client";
 import { useInventoryStore } from "@/features/inventory/store";
+import { syncEngine } from "@/features/sync/engine";
 import React, { useEffect, useState } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,6 +19,8 @@ const InventoryScreen = () => {
   const [name, setName] = useState("");
   const [sku, setSku] = useState("");
 
+  const [syncing, setSyncing] = useState(false);
+
   useEffect(() => {
     if (success) refresh();
   }, [success]);
@@ -32,6 +35,26 @@ const InventoryScreen = () => {
 
     setName("");
     setSku("");
+  };
+
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const result = await syncEngine.pushChanges();
+      if (result.count > 0) {
+        await refresh(); // Refresh UI to show green "Synced" status
+        alert(`Synced ${result.count} items!`);
+      } else {
+        console.log("No changes to sync.");
+
+        alert("Everything is up to date.");
+      }
+    } catch (e) {
+      console.error("Sync Error:", e);
+      alert("Sync Error. Check console.");
+    } finally {
+      setSyncing(false);
+    }
   };
 
   if (error) {
@@ -62,6 +85,17 @@ const InventoryScreen = () => {
           <Text className="text-slate-400 text-sm">
             Manage your items and stock
           </Text>
+        </View>
+        <View className="flex-row justify-between items-center mb-6">
+          <Text className="text-2xl font-bold text-white">GridLock</Text>
+          <Button
+            variant="outline"
+            onPress={handleSync}
+            disabled={syncing}
+            className="py-2 px-4" // Override padding for header button
+          >
+            <Text>{syncing ? "Syncing..." : "Sync Cloud"}</Text>
+          </Button>
         </View>
 
         {/* Add Item Card */}

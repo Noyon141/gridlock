@@ -33,12 +33,48 @@ app.get("/", (c) => {
 });
 
 app.post("/api/inventory/sync", async (c) => {
-  const session = await auth.api.getSession({
+  console.log("=== DEBUG: Request Headers ===");
+  c.req.raw.headers.forEach((value, key) => {
+    console.log(`${key}: ${value}`);
+  });
+  console.log("=== END Headers ===");
+
+  let session = await auth.api.getSession({
     headers: c.req.raw.headers,
   });
 
-  if (!session?.user || !session) {
-    console.log("Unauthorized access attempt to /api/inventory/sync");
+  if (!session?.user) {
+    const cookieHeader = c.req.raw.headers.get("cookie");
+
+    console.log("Cookie Header:", cookieHeader);
+
+    const tokenMatch = cookieHeader?.match(
+      /better-auth\.session_token=([^;]+)/,
+    );
+
+    const token = tokenMatch?.[1];
+
+    console.log("Extracted Token:", token);
+
+    if (token) {
+      const sessionData = await db.query.session.findFirst({
+        where: (session: any, { eq, and, gt }: any) =>
+          and(eq(session.token, token), gt(session.expiresAt, new Date())),
+        with: {
+          user: true,
+        },
+      });
+
+      console.log("Manual Session Data:", sessionData);
+
+      if (sessionData?.user) {
+        session = { user: sessionData.user, session: sessionData };
+      }
+    }
+  }
+
+  if (!session?.user) {
+    console.log("Unauthorized: No valid session found after manual check.");
 
     return c.json({ error: "Unauthorized" }, 401);
   }
@@ -77,7 +113,7 @@ app.post("/api/inventory/sync", async (c) => {
           name: sql`excluded.name`,
           sku: sql`excluded.sku`,
           quantity: sql`excluded.quantity`,
-          updatedAt: sql`excluded.updatedAt`,
+          updatedAt: sql`excluded.updated_at`,
         },
       });
 

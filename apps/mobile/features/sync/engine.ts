@@ -25,6 +25,8 @@ export const syncEngine = {
 
     const session = await authClient.getSession();
 
+    console.log("Current Session:", session.data?.session.token);
+
     if (!session.data || !session.data?.user) {
       throw new Error("No valid session found. Cannot sync data.");
     }
@@ -34,19 +36,15 @@ export const syncEngine = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.data?.session.token}`,
+          Cookie: `better-auth.session_token=${session.data?.session.token}`,
         },
         body: JSON.stringify({ items: unSyncedItems }),
       });
 
       if (!response.ok) {
-        console.log(
-          "Failed to sync data: ENGINE.TS",
-          response.status,
-          response.statusText,
-        );
+        console.log("Failed to sync data: ENGINE.TS", response.statusText);
 
-        throw new Error(`Server responded with status ${response.status}`);
+        throw new Error(`Server responded with status ${response.statusText}`);
       }
 
       for (const item of unSyncedItems) {
